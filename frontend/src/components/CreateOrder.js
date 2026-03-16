@@ -42,6 +42,11 @@ function CreateOrder() {
       return;
     }
 
+    if (selectedProductData && quantity > selectedProductData.inventory_count) {
+    setMessage({ type: 'error', text: 'Quantity exceeds available stock' });
+    return;
+  }
+
     const result = await createOrder({
       customer_id: parseInt(selectedCustomer),
       product_id: parseInt(selectedProduct),
