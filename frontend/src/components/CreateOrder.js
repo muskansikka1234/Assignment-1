@@ -9,6 +9,7 @@ function CreateOrder() {
   const [quantity, setQuantity] = useState(1);
   const [address, setAddress] = useState('');
   const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // Load customers and products
   useEffect(() => {
@@ -37,16 +38,19 @@ function CreateOrder() {
   }, [products, selectedProduct]); // Missing: selectedProduct
 
   const handleSubmit = async () => {
-    if (!selectedCustomer || !selectedProduct || !address) {
-      setMessage({ type: 'error', text: 'Please fill all fields' });
-      return;
-    }
+  if (!selectedCustomer || !selectedProduct || !address) {
+    setMessage({ type: 'error', text: 'Please fill all fields' });
+    return;
+  }
 
-    if (selectedProductData && quantity > selectedProductData.inventory_count) {
+  if (selectedProductData && quantity > selectedProductData.inventory_count) {
     setMessage({ type: 'error', text: 'Quantity exceeds available stock' });
     return;
   }
 
+  setLoading(true);
+
+  try {
     const result = await createOrder({
       customer_id: parseInt(selectedCustomer),
       product_id: parseInt(selectedProduct),
@@ -64,7 +68,12 @@ function CreateOrder() {
       setAddress('');
       setSelectedProductData(null);
     }
-  };
+  } catch (err) {
+    setMessage({ type: 'error', text: 'Failed to create order' });
+  }
+
+  setLoading(false);
+};
 
   return (
     <div className="create-order">
@@ -122,8 +131,8 @@ function CreateOrder() {
         />
       </div>
 
-      <button className="submit-btn" onClick={handleSubmit}>
-        Place Order
+      <button className="submit-btn" onClick={handleSubmit} disabled={loading}>
+        {loading ? "Placing Order..." : "Place Order"}
       </button>
     </div>
   );
