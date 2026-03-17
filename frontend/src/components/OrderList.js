@@ -12,10 +12,17 @@ function OrderList() {
   }, []);
 
   const handleStatusChange = async (orderId, newStatus) => {
+  try {
     await updateOrderStatus(orderId, newStatus);
+
     const data = await fetchOrders();
     setOrders(data);
-  };
+
+  } catch (error) {
+    console.error("Failed to update order status:", error);
+    alert("Unable to update order status. Please try again.");
+  }
+};
 
   const sortedOrders = [...orders].sort((a, b) => {
     let aVal = a[sortField];
