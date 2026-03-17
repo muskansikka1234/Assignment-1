@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { fetchOrders, updateOrderStatus } from '../api';
 
 function OrderList() {
@@ -36,16 +36,20 @@ function OrderList() {
   }
 };
 
-  const sortedOrders = [...orders].sort((a, b) => {
+  const sortedOrders = useMemo(() => {
+  return [...orders].sort((a, b) => {
     let aVal = a[sortField];
     let bVal = b[sortField];
+
     if (sortField === 'total_amount') {
       aVal = parseFloat(aVal);
       bVal = parseFloat(bVal);
     }
+
     if (sortDir === 'asc') return aVal > bVal ? 1 : -1;
     return aVal < bVal ? 1 : -1;
   });
+}, [orders, sortField, sortDir]);
 
   const handleSort = (field) => {
     if (field === sortField) {
